@@ -16,8 +16,6 @@ Pretty simple project, definitely the downgrade from the original idea, definite
 
 # TODO
 
-Ability to have multiple files
-
-command to cancel current cmd
-
-Help command
+- Ability to have multiple files
+- command to cancel current cmd
+- Help command
