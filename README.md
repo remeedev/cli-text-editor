@@ -14,8 +14,13 @@ Pretty simple project, definitely the downgrade from the original idea, definite
 1. On edit now the edited line will be highlighted so you can view its previous content
 1. Added function to delete a line or multiple lines
 
+04/10/2023:
+1. Added function to delete a specific line
+1. command to cancel current cmd
+
 # TODO
 
-- Ability to have multiple files
-- command to cancel current cmd
+- ctrl z
 - Help command
+- Ability to have multiple files
+- Ability to change settings

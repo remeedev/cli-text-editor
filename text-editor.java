@@ -189,6 +189,9 @@ class textEditor{
         readFile(path, line, end);
         System.out.print(line+"| ");
         String change = globalScanner.nextLine();
+        if (change.equals("%exit%")){
+            return 0;
+        }
         lines[line-1] = change;
         try{
             FileWriter writer = new FileWriter(file);
@@ -197,6 +200,7 @@ class textEditor{
         }catch(IOException e){
             e.printStackTrace();
         }
+        cls();
         readFile(path, null, null);
         return 0;
     }
@@ -210,7 +214,7 @@ class textEditor{
         return out;
     }
     // Function to write from 0 the file
-    public static void write(String path){
+    public static int write(String path){
         int blankCounter = 0;
         String[] content = {};
         while(blankCounter < 2){
@@ -218,6 +222,9 @@ class textEditor{
             String data = globalScanner.nextLine();
             if(data.equals("")){
                 blankCounter++;
+            }
+            if(data.equals("%exit%")){
+                return 0;
             }
             content = append(content, data);
         }
@@ -230,6 +237,7 @@ class textEditor{
         }catch(IOException e){
             e.printStackTrace();
         }
+        return 0;
     }
     // Function to pop last element from list
     public static String[] pop(String[] list){
@@ -240,7 +248,7 @@ class textEditor{
         return out;
     }
     // Function to write from end of file
-    public static void writeEnd(String path){
+    public static int writeEnd(String path){
         String[] lines = new String[fileLength];
         File file = new File(path);
         try{
@@ -264,6 +272,9 @@ class textEditor{
             if(data.equals("")){
                 blankCounter++;
             }
+            if(data.equals("%exit%")){
+                return 0;
+            }
             content = append(content, data);
         }
         for(int i=0; i<maxBlanks; i++){
@@ -276,6 +287,7 @@ class textEditor{
         }catch(IOException e){
             e.printStackTrace();
         }
+        return 0;
     }
     // Function that starts writing from a specific line
     public static int writeFrom(String path, int from, Integer to){
@@ -356,6 +368,34 @@ class textEditor{
             e.printStackTrace();
         }
     }
+    // Function to delete a specific line
+    public static void delLine(String path, int line){
+        String[] content = new String[fileLength-1];
+        File file = new File(path);
+        try {
+            Scanner reader = new Scanner(file);
+            int curr_line = 1;
+            int index = 0;
+            while(reader.hasNextLine()){
+                String data = reader.nextLine();
+                if(curr_line != line){
+                    content[index] = data;
+                    index++;
+                }
+                curr_line++;
+            }
+            reader.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try{
+            FileWriter writer = new FileWriter(file);
+            writer.write(join(content, "\n"));
+            writer.close();
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+    }
     // Function to process all commands
     public static Integer cmd(String path){
         String[] quitCommands = {"quit", "exit", "xt", "qu", "x", "ex"};
@@ -407,10 +447,13 @@ class textEditor{
             }
             if(args[0].equals("add") && args[1].equals("edit")){
                 addLine(path, args.length>2?Integer.parseInt(args[2]):1, args.length>3?Integer.parseInt(args[3]):null);
-                writeFrom(path, args.length>2?(Integer.parseInt(args[2])<0?fileLength:Integer.parseInt(args[2])):1, args.length>3?(Integer.parseInt(args[3])<0?fileLength:Integer.parseInt(args[3])):1);
+                writeFrom(path, args.length>2?(Integer.parseInt(args[2])<0?fileLength:Integer.parseInt(args[2])):1, args.length>3?(Integer.parseInt(args[3])<0?fileLength:Integer.parseInt(args[3])):args.length>2?(Integer.parseInt(args[2])<0?fileLength:Integer.parseInt(args[2])):1);
             }
             if(args[0].equals("dellines")){
                 delLines(path, Integer.parseInt(args[1]));
+            }
+            if(args[0].equals("delline")){
+                delLine(path, Integer.parseInt(args[1]));
             }
         }
         cmd(path);
