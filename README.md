@@ -3,3 +3,21 @@
 Just a text editor that works from the windows cmd.exe
 
 Pretty simple project, definitely the downgrade from the original idea, definitely will improve on concept.
+
+## Log
+
+03/10/2023:
+1. Created function to add blank lines and to edit them afterward
+1. Created function to edit in a range lines or until user doesn't want to keep on editing
+1. Created function to delete file
+1. Added a settings file
+1. On edit now the edited line will be highlighted so you can view its previous content
+1. Added function to delete a line or multiple lines
+
+# TODO
+
+Ability to have multiple files
+
+command to cancel current cmd
+
+Help command
