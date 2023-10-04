@@ -6,6 +6,7 @@ class textEditor{
     public static Boolean read_on_start = true;
     public static Boolean highlight_text_edit = true;
     public static int color = 0;
+    public static String[] savedContent;
     //Load Up Settings
     public static void loadConf(){
         File file = new File("settings.txt");
@@ -93,6 +94,45 @@ class textEditor{
             }
         }
         return c;
+    }
+    // Function to keep previous data
+    public static void saveData(String path){
+        File file = new File(path);
+        try{
+            Scanner reader = new Scanner(file);
+            int i = 0;
+            while(reader.hasNextLine()){
+                i++;
+                reader.nextLine();
+            }
+            fileLength = i;
+            savedContent = new String[fileLength];
+            reader.close();
+            reader = new Scanner(file);
+            int index = 0;
+            while(reader.hasNextLine()){
+                String data = reader.nextLine();
+                savedContent[index] = data;
+                index++;
+            }
+            reader.close();
+        }catch(FileNotFoundException e){
+            System.out.println("There was an error reading the file!");
+            e.printStackTrace();
+        }
+    }
+    // Function to restore to before the last change
+    public static void restoreData(String path){
+        String[] oldSave = savedContent;
+        saveData(path);
+        File file = new File(path);
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(join(oldSave, "\n"));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     // Function that reads file
     public static void readFile(String path,Integer start, Integer end){
@@ -369,8 +409,11 @@ class textEditor{
         }
     }
     // Function to delete a specific line
-    public static void delLine(String path, int line){
-        String[] content = new String[fileLength-1];
+    public static void delLine(String path, int line, Integer endLine){
+        if (endLine == null){
+            endLine = line;
+        }
+        String[] content = new String[fileLength-(endLine-line + 1)];
         File file = new File(path);
         try {
             Scanner reader = new Scanner(file);
@@ -378,7 +421,7 @@ class textEditor{
             int index = 0;
             while(reader.hasNextLine()){
                 String data = reader.nextLine();
-                if(curr_line != line){
+                if(!(curr_line>=line && curr_line <= endLine)){
                     content[index] = data;
                     index++;
                 }
@@ -396,6 +439,39 @@ class textEditor{
             e.printStackTrace();
         }
     }
+    // Just help command
+    public static void help(){
+        String[] out = {
+            "Help Menu",
+            "help : opens this menu",
+            "quit, exit, xt, qu, x, ex : command to exit current file",
+            "read : reads the current file",
+            "",
+            "zz : undo last command done",
+            "%exit% : only allowed in write, and edit commands to cancel command",
+            "",
+            colors[color]+"MULTIPLE SINTAX COMMANDS"+colors[0],
+            "write : writes from the last line",
+            "write 0 : write from the first line (erases all current data of file)",
+            "write <line> : write from the line specified, have to confirm for each line",
+            "write <from> <to> : write from the line specified to the second line specified",
+            "",
+            "del : deletes file, has confirmation",
+            "del y : deletes file has no confirmation",
+            "",
+            "delline : deletes the last line of file",
+            "dellines <lines> : deletes the last number of lines specified",
+            "delline <line> : deletes specified line",
+            "delline <line> <endline> : deletes the lines from the first line specified to the second one",
+            "",
+            "add <line> : adds one line before the specified line",
+            "add -1 : adds one line to the end",
+            "add <line> <lines> : adds the specified number of lines before the specified line",
+            "add edit <line> : adds a line before the specified line and makes you edit that line",
+            "add edit <line> <lines>: same as above but for the amount of lines specified"
+        };
+        System.out.println(join(out, "\n"));
+    }
     // Function to process all commands
     public static Integer cmd(String path){
         String[] quitCommands = {"quit", "exit", "xt", "qu", "x", "ex"};
@@ -407,12 +483,16 @@ class textEditor{
         }
         String[] args = command.split(" ");
         if(args.length==1){
+            if(args[0].equals("help")){
+                help();
+            }
             if (args[0].equals("read")){
                 cls();
                 readFile(path, null, null);
             }
             if(args[0].equals("write")){
                 cls();
+                saveData(path);
                 writeEnd(path);
             }
             if(args[0].equals("del")){
@@ -423,14 +503,20 @@ class textEditor{
                 }
             }
             if(args[0].equals("delline")){
+                saveData(path);
                 delLines(path, 1);
+            }
+            if(args[0].equals("zz")){
+                restoreData(path);
             }
         }
         if(args.length>1){
             if(args[0].equals("edit")){
+                saveData(path);
                 edit(path, Integer.parseInt(args[1]));
             }
             if(args[0].equals("write")){
+                saveData(path);
                 if(args[1].equals("0")){
                     write(path);
                 }else{
@@ -438,6 +524,7 @@ class textEditor{
                 }
             }
             if(args[0].equals("add") && !args[1].equals("edit")){
+                saveData(path);
                 addLine(path, Integer.parseInt(args[1]), args.length<3 ? null:Integer.parseInt(args[2]));
             }
             if(args[0].equals("del") && args[1].equals("y")){
@@ -446,14 +533,17 @@ class textEditor{
                 return 0;
             }
             if(args[0].equals("add") && args[1].equals("edit")){
+                saveData(path);
                 addLine(path, args.length>2?Integer.parseInt(args[2]):1, args.length>3?Integer.parseInt(args[3]):null);
                 writeFrom(path, args.length>2?(Integer.parseInt(args[2])<0?fileLength:Integer.parseInt(args[2])):1, args.length>3?(Integer.parseInt(args[3])<0?fileLength:Integer.parseInt(args[3])):args.length>2?(Integer.parseInt(args[2])<0?fileLength:Integer.parseInt(args[2])):1);
             }
             if(args[0].equals("dellines")){
+                saveData(path);
                 delLines(path, Integer.parseInt(args[1]));
             }
             if(args[0].equals("delline")){
-                delLine(path, Integer.parseInt(args[1]));
+                saveData(path);
+                delLine(path, Integer.parseInt(args[1]), args.length>2?Integer.parseInt(args[2]):null);
             }
         }
         cmd(path);

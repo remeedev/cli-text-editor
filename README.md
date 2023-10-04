@@ -17,10 +17,11 @@ Pretty simple project, definitely the downgrade from the original idea, definite
 04/10/2023:
 1. Added function to delete a specific line
 1. command to cancel current cmd
+1. ctrl z
+1. Inner file help command
+1. Function to delete multiple lines in file
 
 # TODO
 
-- ctrl z
-- Help command
 - Ability to have multiple files
 - Ability to change settings
