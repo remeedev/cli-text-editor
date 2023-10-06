@@ -572,7 +572,7 @@ class textEditor{
             System.out.println("max amount of initially loaded files is 100");
             System.exit(0);
         }
-        if(args.length>0){
+        if(true){
             String[] temp = new String[100];
             String[] file_paths;
             int file_number = 0;
@@ -589,12 +589,10 @@ class textEditor{
                 file_paths[file_number] = temp_;
                 file_number++;
             }
-            if(file_paths.length == 1){
-                cmd(file_paths[0]);
-            }else{
+            if(true){
                 String in = "";
                 while(!in.equals("exit")){
-                    System.out.print(">");
+                    System.out.print(System.getProperty("user.dir")+">>>");
                     in = globalScanner.nextLine();
                     String[] splitcmd = in.split(" ");
                     if(splitcmd[0].equals("open")){
@@ -656,9 +654,51 @@ class textEditor{
                             i++;
                         }
                     }
+                    if(splitcmd[0].equals("rm")){
+                        if(splitcmd.length > 1){
+                            try {
+                                file_paths = remove(file_paths, Integer.parseInt(splitcmd[1])-1);
+                            } catch (NumberFormatException e) {
+                                if(contains(file_paths, splitcmd[1])){
+                                    int temp_index = 0;
+                                    for(String _elem:file_paths){
+                                        if(_elem.equals(splitcmd[1])){
+                                            break;
+                                        }
+                                        temp_index++;
+                                    }
+                                    file_paths = remove(file_paths, temp_index);
+                                }
+                            }
+                        }
+                    }
                     if(splitcmd[0].equals("add")){
                         if(splitcmd.length>1){
-                            // Need to do this
+                            if(count(splitcmd[0], '.')==0){
+                                if(splitcmd[1].equals("*")){
+                                    String currentPath = System.getProperty("user.dir");
+                                    File folder = new File(currentPath);
+                                    File[] listOfFiles = folder.listFiles();
+                                    for(int i = 0; i<listOfFiles.length; i++){
+                                        if(listOfFiles[i].isFile()){
+                                            file_paths = append(file_paths, listOfFiles[i].getName());
+                                        }
+                                    }
+                                }
+                                File possible_dir = new File(splitcmd[1]);
+                                if(possible_dir.isDirectory()){
+                                    File[] listOfFiles = possible_dir.listFiles();
+                                    for(int i = 0; i<listOfFiles.length; i++){
+                                        if(listOfFiles[i].isFile()){
+                                            file_paths = append(file_paths, listOfFiles[i].getName());
+                                        }
+                                    }
+                                }
+                            }else{
+                                if(checkFile(splitcmd[1])){
+                                    file_paths = append(file_paths, splitcmd[1]);
+                                }
+                            }
                         }
                     }
                 }
