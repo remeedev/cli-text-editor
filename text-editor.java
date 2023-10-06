@@ -7,6 +7,30 @@ class textEditor{
     public static Boolean highlight_text_edit = true;
     public static int color = 0;
     public static String[] savedContent;
+    // Function to change the settings
+    public static void changeConf(){
+        File file = new File("settings.txt");
+        try {
+            Scanner reader = new Scanner(file);
+            String[] out = new String[3];
+            int i = 0;
+            while(reader.hasNextLine()){
+                String data = reader.nextLine();
+                String[] args = data.split(":");
+                System.out.print(args[0] + ":");
+                out[i] = args[0]+":"+globalScanner.nextLine();
+                i++;
+            }
+            reader.close();
+            FileWriter writer = new FileWriter(file);
+            writer.write(join(out, "\n"));
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("No settings file found, continuing with default settings");
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
     //Load Up Settings
     public static void loadConf(){
         File file = new File("settings.txt");
@@ -610,6 +634,9 @@ class textEditor{
                             }
                             if(found){cmd(file_paths[elem_number]);}else{System.out.println("File name not found in added file lists");}
                         }
+                    }
+                    if(splitcmd[0].equals("settings")){
+                        changeConf();
                     }
                     if(splitcmd[0].equals("del")){
                         try{

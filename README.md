@@ -26,7 +26,3 @@ Pretty simple project, definitely the downgrade from the original idea, definite
 1. Ability to add files with *
 1. Ability to add new files without closing app
 1. Ability to add files from a directory
-
-# TODO
-
-- Ability to change settings
