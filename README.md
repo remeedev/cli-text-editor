@@ -21,7 +21,14 @@ Pretty simple project, definitely the downgrade from the original idea, definite
 1. Inner file help command
 1. Function to delete multiple lines in file
 
+05/10/2023:
+1. 
+
 # TODO
 
 - Ability to have multiple files
+- Commands from outside files
 - Ability to change settings
+- Ability to add new files without closing app
+- Ability to add files from a directory
+- Ability to add files with *

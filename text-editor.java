@@ -64,7 +64,7 @@ class textEditor{
     public static boolean checkFile(String path){
         File file = new File(path);
         if(!file.exists()){
-            boolean ans = confirm("File doesn't currently exist, do you want to create the file?");
+            boolean ans = confirm("("+path + ")File doesn't currently exist, do you want to create the file?");
             if(ans){
                 try{
                     file.createNewFile();
@@ -388,6 +388,7 @@ class textEditor{
             int i = 0;
             while(reader.hasNextLine()){
                 content[i] = reader.nextLine();
+                i++;
             }
             reader.close();
         } catch (FileNotFoundException e) {
@@ -550,16 +551,115 @@ class textEditor{
         return 1;
     }
 
+    // Function to remove element from list
+    public static String[] remove(String[] list, int index){
+        String[] out = new String[list.length-1];
+        int temp_index = 0;
+        int temp_index2 = 0;
+        for(String _elem:list){
+            if(temp_index != index){
+                out[temp_index2] = _elem;
+                temp_index2++;
+            }
+            temp_index++;
+        }
+        return out;
+    }
+
     public static void main(String[] args){
         loadConf();
+        if(args.length>100){
+            System.out.println("max amount of initially loaded files is 100");
+            System.exit(0);
+        }
         if(args.length>0){
-            if(args[0].contains(".")){
-                if(count(args[0], '.')==1){
-                    if(checkFile(args[0])){
-                        if(read_on_start){
-                            readFile(args[0], null, null);
+            String[] temp = new String[100];
+            String[] file_paths;
+            int file_number = 0;
+            for(String path:args){
+                if(checkFile(path)){
+                    temp[file_number] = path;
+                    file_number++;
+                }
+            }
+            file_paths = new String[file_number];
+            file_number = 0;
+            for(String temp_:temp){
+                if(temp_ == null){break;}
+                file_paths[file_number] = temp_;
+                file_number++;
+            }
+            if(file_paths.length == 1){
+                cmd(file_paths[0]);
+            }else{
+                String in = "";
+                while(!in.equals("exit")){
+                    System.out.print(">");
+                    in = globalScanner.nextLine();
+                    String[] splitcmd = in.split(" ");
+                    if(splitcmd[0].equals("open")){
+                        try{
+                            cmd(file_paths[Integer.parseInt(splitcmd[1])-1]);
+                        }catch(NumberFormatException e){
+                            int elem_number = 0;
+                            boolean found = false;
+                            for(String _elem:file_paths){
+                                if(splitcmd[1].equals(_elem)){
+                                    found = true;
+                                    break;
+                                }
+                                elem_number++;
+                            }
+                            if(found){cmd(file_paths[elem_number]);}else{System.out.println("File name not found in added file lists");}
                         }
-                        cmd(args[0]);
+                    }
+                    if(splitcmd[0].equals("del")){
+                        try{
+                            String path = file_paths[Integer.parseInt(splitcmd[1])-1];
+                            if(confirm("Do you really want to delete the file?")){
+                                File file = new File(path);
+                                file.delete();
+                                file_paths = remove(file_paths,Integer.parseInt(splitcmd[1])-1);
+                            }
+                        }catch(NumberFormatException e){
+                            int elem_number = 0;
+                            boolean found = false;
+                            for(String _elem:file_paths){
+                                if(splitcmd[1].equals(_elem)){
+                                    found = true;
+                                    break;
+                                }
+                                elem_number++;
+                            }
+                            String path = file_paths[elem_number];
+                            if(found){
+                                if(confirm("Do you really want to delete the file?")){
+                                    File file = new File(path);
+                                    file.delete();
+                                    file_paths = remove(file_paths, elem_number);
+                                }
+                            }else{
+                                System.out.println(path + " not found");
+                            }
+                        }
+                        System.out.println(colors[color] + "Currently opened files:" + colors[0]);
+                        int i = 1;
+                        for(String _elem:file_paths){
+                            System.out.println(i + "[" + _elem + "]");
+                            i++;
+                        }
+                    }
+                    if(splitcmd[0].equals("files")){
+                        int i = 1;
+                        for(String _elem:file_paths){
+                            System.out.println(i + "[" + _elem + "]");
+                            i++;
+                        }
+                    }
+                    if(splitcmd[0].equals("add")){
+                        if(splitcmd.length>1){
+                            // Need to do this
+                        }
                     }
                 }
             }
